@@ -1,6 +1,7 @@
 package com.rey06.product_manager_api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -31,8 +32,13 @@ public class Productos {
 
     // En Producto (opcional, si quieres bidireccional)
     @ManyToMany(mappedBy = "productos")
-    @JsonBackReference
+    @JsonIgnore
     private List<Pedidos> pedidos;
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonBackReference(value = "usuario-producto")
+    private Usuarios usuario;
 
     public Productos() {}
 
@@ -67,4 +73,12 @@ public class Productos {
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
+
+    public Usuarios getUsuario() {return usuario;}
+
+    public void setUsuario(Usuarios usuario) {this.usuario = usuario;}
+
+    public List<Pedidos> getPedidos() {return pedidos;}
+
+    public void setPedidos(List<Pedidos> pedidos) {this.pedidos = pedidos;}
 }

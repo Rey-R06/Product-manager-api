@@ -13,7 +13,7 @@ public class UsuarioServices {
     @Autowired
     IUsuarios repository;
 
-    public Usuarios crearCliente(Usuarios usuario)throws Exception{
+    public Usuarios crearUsuario(Usuarios usuario)throws Exception{
         try {
             return this.repository.save(usuario);
         }catch (Exception e){

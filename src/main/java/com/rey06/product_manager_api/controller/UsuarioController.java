@@ -19,8 +19,8 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<Usuarios>crearUsuario(@Valid @RequestBody Usuarios usuario)throws Exception{
-        Usuarios usuarioNuevo = usuarioServices.crearCliente(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
+        Usuarios usuarioNuevo = usuarioServices.crearUsuario(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuarioNuevo);
     }
 
     @GetMapping
@@ -28,9 +28,9 @@ public class UsuarioController {
         return usuarioServices.buscarTodos();
     }
 
-    @PutMapping("/Usuarios/{id}")
-    public ResponseEntity<Usuarios>actualizarUsuario(Integer id, Usuarios usuarioActualizado)throws Exception{
-        Usuarios actualizado = usuarioServices.actualizarUsuario(id, usuarioActualizado);
-        return ResponseEntity.ok(actualizado);
+    @PutMapping("/Put/{id}")
+    public ResponseEntity<Usuarios>actualizarUsuario(@PathVariable Integer id,@Valid @RequestBody Usuarios usuarioActualizado)throws Exception{
+        Usuarios usuarioNuevo = usuarioServices.actualizarUsuario(id, usuarioActualizado);
+        return ResponseEntity.ok(usuarioNuevo);
     }
 }

@@ -1,7 +1,6 @@
 package com.rey06.product_manager_api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -21,11 +20,13 @@ public class Pedidos {
     @PastOrPresent(message = "La fecha del pedido no puede ser futura.")
     private Date fechaDelPedido;
 
-    @NotNull(message = "El cliente no puede ser nulo.")
+    @Column(name = "total_compra", nullable = false)
+    private Float totalCompra;
+
     @ManyToOne
-    @JoinColumn(name = "fk_cliente", referencedColumnName = "id")
-    @JsonBackReference//la que tenga la many lleva jsonback
-    private Clientes cliente;
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonBackReference(value = "usuario-pedidos")
+    private Usuarios usuario;
 
     @NotEmpty(message = "Debe haber al menos un producto en el pedido.")
     @ManyToMany
@@ -34,22 +35,23 @@ public class Pedidos {
             joinColumns = @JoinColumn(name = "pedido_id"),
             inverseJoinColumns = @JoinColumn(name = "producto_id")
     )
-    @JsonManagedReference
     private List<Productos> productos;
 
 
-    @Column(name = "totalCompra", nullable = false)
-    private Float totalCompra;
-
     public Pedidos(){}
+
+    public Pedidos(Integer id, Date fechaDelPedido, Float totalCompra, Usuarios usuario) {
+        this.id = id;
+        this.fechaDelPedido = fechaDelPedido;
+        this.totalCompra = totalCompra;
+        this.usuario = usuario;
+    }
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    public void setId(Integer id) {this.id = id;}
 
     public Date getFecha() {
         return fechaDelPedido;
@@ -66,4 +68,12 @@ public class Pedidos {
     public void setTotalCompra(Float totalCompra) {
         this.totalCompra = totalCompra;
     }
+
+    public Usuarios getUsuario() {return usuario;}
+
+    public void setUsuario(Usuarios usuario) {this.usuario = usuario;}
+
+    public List<Productos> getProductos() {return productos;}
+
+    public void setProductos( List<Productos> productos) {this.productos = productos;}
 }
