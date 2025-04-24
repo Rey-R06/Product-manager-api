@@ -29,7 +29,7 @@ public class ProductosController {
     }
 
     @PutMapping("/Productos/{id}")
-    public ResponseEntity<Productos>actualizarProducto(Integer id, Productos productoActualizado) throws Exception{
+    public ResponseEntity<Productos>actualizarProducto(@PathVariable Integer id, @Valid @RequestBody Productos productoActualizado) throws Exception{
         Productos actualizado = productosServices.actualizarProducto(id, productoActualizado);
         return ResponseEntity.ok(actualizado);
     }

@@ -33,4 +33,11 @@ public class UsuarioController {
         Usuarios usuarioNuevo = usuarioServices.actualizarUsuario(id, usuarioActualizado);
         return ResponseEntity.ok(usuarioNuevo);
     }
+
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<String> eliminarUsuario(@PathVariable Integer id) throws Exception {
+        usuarioServices.eliminarUsuario(id);
+        return ResponseEntity.ok("Usuario eliminado correctamente");
+    }
+
 }

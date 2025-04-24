@@ -33,4 +33,14 @@ public class PedidosController {
         Pedidos actualizado = pedidosServices.actualizarPedido(id, pedido);
         return ResponseEntity.ok(actualizado);
     }
+
+    @DeleteMapping("eliminar/{id}")
+    public ResponseEntity<?>eliminarPedido(@PathVariable Integer id){
+        try {
+            pedidosServices.eliminarPedido(id);
+            return ResponseEntity.ok("Pedido eliminado exitosamente.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
+        }
+    }
 }
