@@ -8,39 +8,62 @@ import jakarta.validation.constraints.*;
 import java.util.List;
 
 @Entity
-@Table(name="Productos")
+@Table(name = "Productos")
 public class Productos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_producto")
     private Integer id;
 
-    @Column(name = "nombre", length = 100, nullable = false)
     @NotBlank(message = "El nombre del producto no puede estar vacío.")
     private String nombre;
 
-    @Column(name = "precio", nullable = false)
-    @NotNull(message = "El precio no puede ser nulo.")
+    @Size(max = 1000, message = "La descripción no debe exceder los 1000 caracteres.")
+    private String descripcion;
+
     @Positive(message = "El precio debe ser mayor que cero.")
     private Float precio;
 
-    @Column(name = "cantidad", nullable = false)
+    @NotNull(message = "El precio original no puede ser nulo.")
+    @Positive(message = "El precio original debe ser mayor que cero.")
+    private Float precioOriginal;
+
+    private Boolean oferta = false;
+
     @NotNull(message = "El stock no puede ser nulo.")
     @Min(value = 0, message = "El stock no puede ser negativo.")
     private Integer cantidad;
 
-    // En Producto (opcional, si quieres bidireccional)
+    @Size(max = 500, message = "La URL de la imagen no debe exceder 500 caracteres.")
+    private String urlImg;
+
+    private boolean activo = true;
+
     @ManyToMany(mappedBy = "productos")
     @JsonIgnore
     private List<Pedidos> pedidos;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "creado_por_usuario", nullable = true)
     @JsonBackReference(value = "usuario-producto")
     private Usuarios usuario;
 
-    public Productos() {}
+    public Productos() {
+    }
+
+    public Productos(Integer id, String nombre, String descripcion, Float precio, Float precioOriginal, Boolean oferta, Integer cantidad, String urlImg, boolean activo, List<Pedidos> pedidos, Usuarios usuario) {
+        this.id = id;
+        this.nombre = nombre;
+        this.descripcion = descripcion;
+        this.precio = precio;
+        this.precioOriginal = precioOriginal;
+        this.oferta = oferta;
+        this.cantidad = cantidad;
+        this.urlImg = urlImg;
+        this.activo = activo;
+        this.pedidos = pedidos;
+        this.usuario = usuario;
+    }
 
     public Integer getId() {
         return id;
@@ -48,14 +71,6 @@ public class Productos {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public Float getPrecio() {
@@ -66,19 +81,75 @@ public class Productos {
         this.precio = precio;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Float getPrecioOriginal() {
+        return precioOriginal;
+    }
+
+    public void setPrecioOriginal( Float precioOriginal) {
+        this.precioOriginal = precioOriginal;
+    }
+
+    public Boolean getOferta() {
+        return oferta;
+    }
+
+    public void setOferta(Boolean oferta) {
+        this.oferta = oferta;
+    }
+
     public Integer getCantidad() {
         return cantidad;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 
-    public Usuarios getUsuario() {return usuario;}
+    public String getUrlImg() {
+        return urlImg;
+    }
 
-    public void setUsuario(Usuarios usuario) {this.usuario = usuario;}
+    public void setUrlImg(String urlImg) {
+        this.urlImg = urlImg;
+    }
 
-    public List<Pedidos> getPedidos() {return pedidos;}
+    public boolean getActivo() {
+        return activo;
+    }
 
-    public void setPedidos(List<Pedidos> pedidos) {this.pedidos = pedidos;}
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
+    public List<Pedidos> getPedidos() {
+        return pedidos;
+    }
+
+    public void setPedidos(List<Pedidos> pedidos) {
+        this.pedidos = pedidos;
+    }
+
+    public Usuarios getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuarios usuario) {
+        this.usuario = usuario;
+    }
 }

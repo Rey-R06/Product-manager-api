@@ -1,9 +1,11 @@
 package com.rey06.product_manager_api.model;
 
-
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.rey06.product_manager_api.ayudas.Rol;
+import com.rey06.product_manager_api.validation.OnCreate;
+import com.rey06.product_manager_api.validation.OnUpdate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -12,55 +14,52 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name="Usuarios")
-public class  Usuarios {
+@Table(name = "Usuarios")
+public class Usuarios {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "nombre", nullable = false, length = 100)
-    @NotBlank(message = "El nombre no puede estar vacío.")
+    @NotBlank(groups = OnCreate.class, message = "El nombre no puede estar vacío.")
     private String nombre;
 
-    @Column(name = "Email", nullable = false)
-    @Email(message = "El correo electrónico no es válido.")
-    @NotBlank(message = "El correo no puede estar vacío.")
+    @Email(groups = {OnCreate.class, OnUpdate.class}, message = "Correo no válido.")
+    @NotBlank(groups = OnCreate.class, message = "El correo no puede estar vacío.")
     private String email;
 
-    @Column(name = "Contraseña", nullable = false)
+    @NotNull(groups = OnCreate.class, message = "La contraseña no puede ser nula.")
     private String contraseña;
 
-    @Column(name = "direccion", nullable = true)
     private String direccion;
 
-    @Column(name = "telefono", nullable = true)
-    @NotBlank(message = "El teléfono no puede estar vacío.")
-    @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos numéricos.")
+    @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos.")
+    @NotNull(groups = OnCreate.class, message = "El teléfono no puede estar vacío.")
     private String telefono;
 
     @Temporal(TemporalType.DATE)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    @Column(name = "fechaRegistro", nullable = true)
-    @NotNull(message = "La fecha de registro no puede ser nula.")
     @PastOrPresent(message = "La fecha no puede ser futura.")
     private Date fechaRegistro;
 
-    @Column(name = "rol", nullable = false)
-    @NotNull(message = "no puede estar vacio.")
+    @NotNull(groups = OnCreate.class, message = "El rol no puede estar vacío.")
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20) // opcionalmente para limitar el largo
     private Rol rol;
+
 
     @OneToMany(mappedBy = "usuario")
     @JsonManagedReference(value = "usuario-pedidos")
     private List<Pedidos> pedidos = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario")
-    @JsonManagedReference(value = "usuario-producto")
+    @JsonBackReference(value = "usuario-producto")
     private List<Productos> productos = new ArrayList<>();
 
-    public Usuarios(){}
+    public Usuarios() {
+    }
 
-    public Usuarios(Integer id, String nombre, String email, String contraseña, String direccion, String telefono, Date fechaRegistro, Rol rol) {
+    public Usuarios(Integer id, String nombre, String email, String contraseña, String direccion, String telefono, Date fechaRegistro, Rol rol, List<Pedidos> pedidos, List<Productos> productos) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;
@@ -69,6 +68,8 @@ public class  Usuarios {
         this.telefono = telefono;
         this.fechaRegistro = fechaRegistro;
         this.rol = rol;
+        this.pedidos = pedidos;
+        this.productos = productos;
     }
 
     public Integer getId() {
@@ -91,11 +92,11 @@ public class  Usuarios {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail (String email) {
         this.email = email;
     }
 
-    public String getContraseña() {
+    public  String getContraseña() {
         return contraseña;
     }
 
@@ -107,7 +108,7 @@ public class  Usuarios {
         return direccion;
     }
 
-    public void setDireccion(String direccion) {
+    public void setDireccion( String direccion) {
         this.direccion = direccion;
     }
 

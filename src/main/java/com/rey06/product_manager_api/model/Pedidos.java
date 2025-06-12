@@ -1,6 +1,7 @@
 package com.rey06.product_manager_api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.rey06.product_manager_api.ayudas.EstadoPedido;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -15,18 +16,26 @@ public class Pedidos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "fecha")
-    @NotNull(message = "La fecha del pedido no puede ser nula.")
     @PastOrPresent(message = "La fecha del pedido no puede ser futura.")
     private Date fechaDelPedido;
 
-    @Column(name = "total_compra", nullable = false)
+    @Positive(message = "El total debe ser mayor a 0.")
     private Float totalCompra;
 
+    @NotNull(message = "El estado del pedido no puede ser nulo.")
+    @Enumerated(EnumType.STRING)
+    private EstadoPedido estado;
+
+    // Relación con usuario registrado (opcional)
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "usuario_id")
     @JsonBackReference(value = "usuario-pedidos")
     private Usuarios usuario;
+
+    // Datos básicos para pedidos de invitados
+    private String nombreDelPedido;
+    private String emailDelPedido;
+    private String telefonoDelPedido;
 
     @NotEmpty(message = "Debe haber al menos un producto en el pedido.")
     @ManyToMany
@@ -37,27 +46,34 @@ public class Pedidos {
     )
     private List<Productos> productos;
 
+    public Pedidos() {
+    }
 
-    public Pedidos(){}
-
-    public Pedidos(Integer id, Date fechaDelPedido, Float totalCompra, Usuarios usuario) {
+    public Pedidos(Integer id, Date fechaDelPedido, Float totalCompra, EstadoPedido estado, Usuarios usuario, String nombreDelPedido, String emailDelPedido, String telefonoDelPedido, List<Productos> productos) {
         this.id = id;
         this.fechaDelPedido = fechaDelPedido;
         this.totalCompra = totalCompra;
+        this.estado = estado;
         this.usuario = usuario;
+        this.nombreDelPedido = nombreDelPedido;
+        this.emailDelPedido = emailDelPedido;
+        this.telefonoDelPedido = telefonoDelPedido;
+        this.productos = productos;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public void setId(Integer id) {this.id = id;}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    public Date getFecha() {
+    public Date getFechaDelPedido() {
         return fechaDelPedido;
     }
 
-    public void setFecha(Date fechaDelPedido) {
+    public void setFechaDelPedido(Date fechaDelPedido) {
         this.fechaDelPedido = fechaDelPedido;
     }
 
@@ -69,11 +85,51 @@ public class Pedidos {
         this.totalCompra = totalCompra;
     }
 
-    public Usuarios getUsuario() {return usuario;}
+    public EstadoPedido getEstado() {
+        return estado;
+    }
 
-    public void setUsuario(Usuarios usuario) {this.usuario = usuario;}
+    public void setEstado(EstadoPedido estado) {
+        this.estado = estado;
+    }
 
-    public List<Productos> getProductos() {return productos;}
+    public Usuarios getUsuario() {
+        return usuario;
+    }
 
-    public void setProductos( List<Productos> productos) {this.productos = productos;}
+    public void setUsuario(Usuarios usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getNombreDelPedido() {
+        return nombreDelPedido;
+    }
+
+    public void setNombreDelPedido(String nombreDelPedido) {
+        this.nombreDelPedido = nombreDelPedido;
+    }
+
+    public String getEmailDelPedido() {
+        return emailDelPedido;
+    }
+
+    public void setEmailDelPedido(String emailDelPedido) {
+        this.emailDelPedido = emailDelPedido;
+    }
+
+    public String getTelefonoDelPedido() {
+        return telefonoDelPedido;
+    }
+
+    public void setTelefonoDelPedido(String telefonoDelPedido) {
+        this.telefonoDelPedido = telefonoDelPedido;
+    }
+
+    public List<Productos> getProductos() {
+        return productos;
+    }
+
+    public void setProductos(List<Productos> productos) {
+        this.productos = productos;
+    }
 }

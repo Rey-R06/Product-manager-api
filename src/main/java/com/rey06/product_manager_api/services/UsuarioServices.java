@@ -1,12 +1,16 @@
 package com.rey06.product_manager_api.services;
 
+import com.rey06.product_manager_api.ayudas.Rol;
 import com.rey06.product_manager_api.model.Usuarios;
 import com.rey06.product_manager_api.repository.IUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class UsuarioServices {
@@ -38,13 +42,50 @@ public class UsuarioServices {
 
     public Usuarios actualizarUsuario(Integer id, Usuarios usuarioActualizado)throws Exception{
         return repository.findById(id).map(usuarioExistente -> {
-            usuarioExistente.setNombre(usuarioActualizado.getNombre());
-            usuarioExistente.setContraseña(usuarioActualizado.getContraseña());
-            usuarioExistente.setEmail(usuarioActualizado.getEmail());
+
+            if (usuarioActualizado.getNombre() != null){
+                usuarioExistente.setNombre(usuarioActualizado.getNombre());
+            }
+            if (usuarioActualizado.getContraseña() != null){
+                usuarioExistente.setContraseña(usuarioActualizado.getContraseña());
+            }
+            if (usuarioActualizado.getEmail() != null){
+                usuarioExistente.setEmail(usuarioActualizado.getEmail());
+            }
+            if (usuarioActualizado.getDireccion() != null){
+                usuarioExistente.setDireccion(usuarioActualizado.getDireccion());
+            }
 
             return repository.save(usuarioExistente);
-        }).orElseThrow(() -> new Exception("Admin no encontrado con ID: " + id));
+        }).orElseThrow(() -> new Exception("Usuario no encontrado con ID: " + id));
     }
+
+    public Usuarios actualizarParcial(Integer id, Map<String, Object> camposActualizados) {
+        Usuarios usuario = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+
+        camposActualizados.forEach((key, value) -> {
+            Field field = ReflectionUtils.findField(Usuarios.class, key);
+            if (field != null) {
+                field.setAccessible(true);
+
+                // Si el campo es "rol", convertir manualmente el String a Enum
+                if (key.equals("rol")) {
+                    try {
+                        value = Rol.valueOf(value.toString());
+                    } catch (IllegalArgumentException e) {
+                        throw new RuntimeException("Valor inválido para el rol: " + value);
+                    }
+                }
+
+                ReflectionUtils.setField(field, usuario, value);
+            }
+        });
+
+        return repository.save(usuario);
+    }
+
+
 
     public void eliminarUsuario(Integer id) throws Exception {
         if (!repository.existsById(id)) {

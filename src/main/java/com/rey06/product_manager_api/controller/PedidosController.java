@@ -9,9 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/Pedidos")
+@RequestMapping("/pedidos")
 public class PedidosController {
 
     @Autowired
@@ -28,16 +29,29 @@ public class PedidosController {
         return pedidosServices.buscarTodos();
     }
 
-    @PutMapping("/Pedidos/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Pedidos>actualizarPedido(@PathVariable Integer id,@Valid @RequestBody Pedidos pedido) throws Exception{
         Pedidos actualizado = pedidosServices.actualizarPedido(id, pedido);
         return ResponseEntity.ok(actualizado);
     }
 
-    @DeleteMapping("eliminar/{id}")
+    @PatchMapping("/{id}")
+    public ResponseEntity<Pedidos> actualizarParcialPedido(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> camposActualizados) {
+        try {
+            Pedidos pedidoActualizado = pedidosServices.actualizarParcialPedido(id, camposActualizados);
+            return ResponseEntity.ok(pedidoActualizado);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
+    @DeleteMapping("/{id}")
     public ResponseEntity<?>eliminarPedido(@PathVariable Integer id){
         try {
-            pedidosServices.eliminarPedido(id);
+            pedidosServices.eliminarPedido(id);//hacer un push antes de seguir
             return ResponseEntity.ok("Pedido eliminado exitosamente.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());

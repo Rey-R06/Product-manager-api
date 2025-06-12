@@ -1,5 +1,8 @@
 package com.rey06.product_manager_api.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rey06.product_manager_api.ayudas.EstadoPedido;
 import com.rey06.product_manager_api.model.Pedidos;
 import com.rey06.product_manager_api.model.Productos;
 import com.rey06.product_manager_api.model.Usuarios;
@@ -32,36 +35,34 @@ public class PedidosServices {
             // Inicializamos el total de la compra en 0
             final Float[] total = {0f};
 
-
-            //validamos si existe el usuario
-           validarExistenciaUsuario(pedido.getUsuario());
-
-            // Si pasó todas las validaciones, continuamos con el usuario válido
+            // Si el pedido es de usuario registrado
+            if (pedido.getUsuario() != null && pedido.getUsuario().getId() != null) {
+                validarExistenciaUsuario(pedido.getUsuario());
+            } else {
+                // Si es pedido de invitado, validamos los datos mínimos requeridos
+                if (pedido.getNombreDelPedido() == null || pedido.getEmailDelPedido() == null) {
+                    throw new RuntimeException("Faltan datos del pedido para usuario invitado.");
+                }
+            }
 
             // Contamos productos como en crearPedido
             Map<Integer, Integer> contadorProductos = contarProductos(pedido.getProductos());
 
-            //Verificamos que el producto tenga suficiente stock y crea el producto con sus datos finales
+            // Verificamos que el producto tenga suficiente stock y creamos la lista final
             List<Productos> productosFinales = verificarStockYConstruirProductosFinales(contadorProductos, total);
 
-
-            // Asociamos la lista validada de productos al pedido
+            // Asociamos productos, total y fecha al pedido
             pedido.setProductos(productosFinales);
-
-            // Establecemos el total calculado
             pedido.setTotalCompra(total[0]);
+            pedido.setFechaDelPedido(new Date());
 
-            // Establecemos la fecha actual como fecha del pedido
-            pedido.setFecha(new Date());
-
-            // Guardamos el pedido en la base de datos y lo retornamos
             return repository.save(pedido);
 
         } catch (Exception e) {
-            // Si ocurre cualquier error, lo envolvemos y relanzamos
             throw new RuntimeException("Error al crear el pedido: " + e.getMessage());
         }
     }
+
 
     //Buscar todos
     public List<Pedidos> buscarTodos()throws Exception{
@@ -105,13 +106,89 @@ public class PedidosServices {
         pedidoExistente.setProductos(productosFinales);
         pedidoExistente.setTotalCompra(total[0]);
         pedidoExistente.setUsuario(pedidoActualizado.getUsuario());
-        pedidoExistente.setFecha(new Date());
+        pedidoExistente.setFechaDelPedido(new Date());
 
         return repository.save(pedidoExistente);
     }
 
+    @Transactional
+    public Pedidos actualizarParcialPedido(Integer id, Map<String, Object> camposActualizados) throws Exception {
+        Pedidos pedido = repository.findById(id)
+                .orElseThrow(() -> new Exception("Pedido no encontrado con ID: " + id));
 
-    public void eliminarPedido(Integer pedidoId) {
+        ObjectMapper mapper = new ObjectMapper();
+
+        // Si hay que actualizar el usuario
+        if (camposActualizados.containsKey("usuario")) {
+            Usuarios nuevoUsuario = mapper.convertValue(camposActualizados.get("usuario"), Usuarios.class);
+            validarExistenciaUsuario(nuevoUsuario); // lanza excepción si no existe
+            pedido.setUsuario(nuevoUsuario);
+        }
+
+        // Si hay que actualizar productos
+        if (camposActualizados.containsKey("productos")) {
+            // Restauramos stock anterior
+            Map<Integer, Integer> stockAnterior = contarProductos(pedido.getProductos());
+            for (Map.Entry<Integer, Integer> entry : stockAnterior.entrySet()) {
+                Integer productoId = entry.getKey();
+                Integer cantidad = entry.getValue();
+
+                Productos producto = productoRepository.findById(productoId)
+                        .orElseThrow(() -> new RuntimeException("Producto con ID " + productoId + " no encontrado al restaurar stock (PATCH)"));
+
+                producto.setCantidad(producto.getCantidad() + cantidad);
+                productoRepository.save(producto);
+            }
+
+            // Procesamos nuevos productos
+            List<Productos> nuevosProductos = mapper.convertValue(
+                    camposActualizados.get("productos"),
+                    new TypeReference<List<Productos>>() {}
+            );
+
+            Map<Integer, Integer> contadorNuevos = contarProductos(nuevosProductos);
+
+            final Float[] total = {0f};
+            List<Productos> productosFinales = verificarStockYConstruirProductosFinales(contadorNuevos, total);
+
+            pedido.setProductos(productosFinales);
+            pedido.setTotalCompra(total[0]);
+        }
+
+        // Si hay que actualizar el estado
+        if (camposActualizados.containsKey("estado")) {
+            String nuevoEstado = camposActualizados.get("estado").toString().toUpperCase();
+
+            try {
+                pedido.setEstado(EstadoPedido.valueOf(nuevoEstado));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Estado inválido: " + nuevoEstado);
+            }
+        }
+
+        // Si hay que actualizar nombreDelPedido
+        if (camposActualizados.containsKey("nombreDelPedido")) {
+            pedido.setNombreDelPedido(camposActualizados.get("nombreDelPedido").toString());
+        }
+
+        // Si hay que actualizar emailDelPedido
+        if (camposActualizados.containsKey("emailDelPedido")) {
+            pedido.setEmailDelPedido(camposActualizados.get("emailDelPedido").toString());
+        }
+
+        // Si hay que actualizar telefonoDelPedido
+        if (camposActualizados.containsKey("telefonoDelPedido")) {
+            pedido.setTelefonoDelPedido(camposActualizados.get("telefonoDelPedido").toString());
+        }
+
+        // Siempre actualizamos la fecha del pedido cuando hay cambios
+        pedido.setFechaDelPedido(new Date());
+
+        return repository.save(pedido);
+    }
+
+
+    public void eliminarPedido(Integer pedidoId){
         Pedidos pedido = repository.findById(pedidoId)
                 .orElseThrow(() -> new RuntimeException("Pedido con ID " + pedidoId + " no encontrado"));
 

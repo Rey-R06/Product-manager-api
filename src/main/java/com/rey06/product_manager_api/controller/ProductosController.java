@@ -9,9 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("Producto")
+@RequestMapping("/productos")
 public class ProductosController {
 
     @Autowired
@@ -19,7 +21,7 @@ public class ProductosController {
 
     @PostMapping
     public ResponseEntity<Productos>crearProducto(@Valid @RequestBody Productos producto)throws Exception{
-        Productos productoNuevo = productosServices.crearCliente(producto);
+        Productos productoNuevo = productosServices.crearProducto(producto);
         return ResponseEntity.status(HttpStatus.CREATED).body(productoNuevo);
     }
 
@@ -28,9 +30,33 @@ public class ProductosController {
         return productosServices.buscarTodos();
     }
 
-    @PutMapping("/Productos/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Productos>actualizarProducto(@PathVariable Integer id, @Valid @RequestBody Productos productoActualizado) throws Exception{
         Productos actualizado = productosServices.actualizarProducto(id, productoActualizado);
         return ResponseEntity.ok(actualizado);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Productos> actualizarParcialProducto(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> camposActualizados) {
+        try {
+            Productos producto = productosServices.actualizarParcialProducto(id, camposActualizados);
+            return ResponseEntity.ok(producto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+
+    // Endpoint para eliminar un producto (DELETE)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarProducto(@PathVariable Integer id) {
+        try {
+            productosServices.eliminarProducto(id);
+            return ResponseEntity.ok("Producto eliminado exitosamente.");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado.");
+        }
     }
 }
