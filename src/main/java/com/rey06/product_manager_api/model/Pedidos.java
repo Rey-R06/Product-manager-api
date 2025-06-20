@@ -2,6 +2,7 @@ package com.rey06.product_manager_api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.rey06.product_manager_api.ayudas.EstadoPedido;
+import com.rey06.product_manager_api.ayudas.MetodoDePago;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -37,19 +38,21 @@ public class Pedidos {
     private String emailDelPedido;
     private String telefonoDelPedido;
 
+    @Enumerated(EnumType.STRING)
+    private MetodoDePago metodoDePago;
+
+    @Column(nullable = false)
+    private String direccionEntrega;
+
     @NotEmpty(message = "Debe haber al menos un producto en el pedido.")
-    @ManyToMany
-    @JoinTable(
-            name = "pedido_producto",
-            joinColumns = @JoinColumn(name = "pedido_id"),
-            inverseJoinColumns = @JoinColumn(name = "producto_id")
-    )
-    private List<Productos> productos;
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemPedido> itemsPedido;
+
 
     public Pedidos() {
     }
 
-    public Pedidos(Integer id, Date fechaDelPedido, Float totalCompra, EstadoPedido estado, Usuarios usuario, String nombreDelPedido, String emailDelPedido, String telefonoDelPedido, List<Productos> productos) {
+    public Pedidos(Integer id, Date fechaDelPedido, Float totalCompra, EstadoPedido estado, Usuarios usuario, String nombreDelPedido, String emailDelPedido, String telefonoDelPedido, MetodoDePago metodoDePago, String direccionEntrega, List<ItemPedido> itemsPedido) {
         this.id = id;
         this.fechaDelPedido = fechaDelPedido;
         this.totalCompra = totalCompra;
@@ -58,7 +61,9 @@ public class Pedidos {
         this.nombreDelPedido = nombreDelPedido;
         this.emailDelPedido = emailDelPedido;
         this.telefonoDelPedido = telefonoDelPedido;
-        this.productos = productos;
+        this.metodoDePago = metodoDePago;
+        this.direccionEntrega = direccionEntrega;
+        this.itemsPedido = itemsPedido;
     }
 
     public Integer getId() {
@@ -89,6 +94,14 @@ public class Pedidos {
         return estado;
     }
 
+    public String getDireccionEntrega() {
+        return direccionEntrega;
+    }
+
+    public void setDireccionEntrega(String direccionEntrega) {
+        this.direccionEntrega = direccionEntrega;
+    }
+
     public void setEstado(EstadoPedido estado) {
         this.estado = estado;
     }
@@ -99,6 +112,14 @@ public class Pedidos {
 
     public void setUsuario(Usuarios usuario) {
         this.usuario = usuario;
+    }
+
+    public MetodoDePago getMetodoDePago() {
+        return metodoDePago;
+    }
+
+    public void setMetodoDePago(MetodoDePago metodoDePago) {
+        this.metodoDePago = metodoDePago;
     }
 
     public String getNombreDelPedido() {
@@ -125,11 +146,11 @@ public class Pedidos {
         this.telefonoDelPedido = telefonoDelPedido;
     }
 
-    public List<Productos> getProductos() {
-        return productos;
+    public List<ItemPedido> getItemsPedido() {
+        return itemsPedido;
     }
 
-    public void setProductos(List<Productos> productos) {
-        this.productos = productos;
+    public void setItemsPedido(List<ItemPedido> itemsPedido) {
+        this.itemsPedido = itemsPedido;
     }
 }

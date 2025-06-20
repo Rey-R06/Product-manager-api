@@ -30,6 +30,10 @@ public class UsuarioServices {
             throw new RuntimeException(e.getMessage());
         }
     }
+    //Buscar 1
+    public Usuarios obtenerUsuarioPorId(Integer id) {
+        return repository.findById(id).orElse(null);
+    }
 
     //Buscar todos
     public List<Usuarios> buscarTodos()throws Exception{
@@ -51,9 +55,6 @@ public class UsuarioServices {
             }
             if (usuarioActualizado.getEmail() != null){
                 usuarioExistente.setEmail(usuarioActualizado.getEmail());
-            }
-            if (usuarioActualizado.getDireccion() != null){
-                usuarioExistente.setDireccion(usuarioActualizado.getDireccion());
             }
 
             return repository.save(usuarioExistente);

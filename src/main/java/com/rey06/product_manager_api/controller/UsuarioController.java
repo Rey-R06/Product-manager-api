@@ -34,6 +34,17 @@ public class UsuarioController {
         return usuarioServices.buscarTodos();
     }
 
+    // GET /usuarios/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuarios> obtenerUsuarioPorId(@PathVariable Integer id) {
+        Usuarios usuario = usuarioServices.obtenerUsuarioPorId(id);
+        if (usuario != null) {
+            return ResponseEntity.ok(usuario);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Usuarios> actualizarUsuario(
             @NotNull(message = "El ID no puede ser nulo.")

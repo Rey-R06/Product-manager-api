@@ -34,14 +34,17 @@ public class Productos {
     @Min(value = 0, message = "El stock no puede ser negativo.")
     private Integer cantidad;
 
+    @NotBlank(message = "La categoría no puede estar vacía.")
+    private String categoria;
+
+
     @Size(max = 500, message = "La URL de la imagen no debe exceder 500 caracteres.")
     private String urlImg;
 
     private boolean activo = true;
 
-    @ManyToMany(mappedBy = "productos")
-    @JsonIgnore
-    private List<Pedidos> pedidos;
+    @OneToMany(mappedBy = "producto")
+    private List<ItemPedido> itemsPedido;
 
     @ManyToOne
     @JoinColumn(name = "creado_por_usuario", nullable = true)
@@ -51,7 +54,7 @@ public class Productos {
     public Productos() {
     }
 
-    public Productos(Integer id, String nombre, String descripcion, Float precio, Float precioOriginal, Boolean oferta, Integer cantidad, String urlImg, boolean activo, List<Pedidos> pedidos, Usuarios usuario) {
+    public Productos(Integer id, String nombre, String descripcion, Float precio, Float precioOriginal, Boolean oferta, Integer cantidad, String categoria, String urlImg, boolean activo, Usuarios usuario, List<ItemPedido> itemsPedido) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -59,10 +62,11 @@ public class Productos {
         this.precioOriginal = precioOriginal;
         this.oferta = oferta;
         this.cantidad = cantidad;
+        this.categoria = categoria;
         this.urlImg = urlImg;
         this.activo = activo;
-        this.pedidos = pedidos;
         this.usuario = usuario;
+        this.itemsPedido = itemsPedido;
     }
 
     public Integer getId() {
@@ -105,6 +109,18 @@ public class Productos {
         this.oferta = oferta;
     }
 
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
     public Integer getCantidad() {
         return cantidad;
     }
@@ -137,13 +153,7 @@ public class Productos {
         this.activo = activo;
     }
 
-    public List<Pedidos> getPedidos() {
-        return pedidos;
-    }
 
-    public void setPedidos(List<Pedidos> pedidos) {
-        this.pedidos = pedidos;
-    }
 
     public Usuarios getUsuario() {
         return usuario;

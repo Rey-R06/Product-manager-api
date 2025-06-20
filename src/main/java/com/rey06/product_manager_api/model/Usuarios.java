@@ -31,9 +31,7 @@ public class Usuarios {
     @NotNull(groups = OnCreate.class, message = "La contraseña no puede ser nula.")
     private String contraseña;
 
-    private String direccion;
-
-    @Pattern(regexp = "^[0-9]{10}$", message = "El teléfono debe tener 10 dígitos.")
+    @Pattern(regexp = "^[0-9]{7,15}$", message = "El teléfono debe contener entre 7 y 15 dígitos.")
     @NotNull(groups = OnCreate.class, message = "El teléfono no puede estar vacío.")
     private String telefono;
 
@@ -47,6 +45,10 @@ public class Usuarios {
     @Column(length = 20) // opcionalmente para limitar el largo
     private Rol rol;
 
+    private Boolean registrado = false; // valor por defecto
+
+    @ElementCollection
+    private List<String> historialPedidos = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario")
     @JsonManagedReference(value = "usuario-pedidos")
@@ -59,15 +61,16 @@ public class Usuarios {
     public Usuarios() {
     }
 
-    public Usuarios(Integer id, String nombre, String email, String contraseña, String direccion, String telefono, Date fechaRegistro, Rol rol, List<Pedidos> pedidos, List<Productos> productos) {
+    public Usuarios(Integer id, String nombre, String email, String contraseña, String telefono, Date fechaRegistro, Boolean registrado, Rol rol, List<String> historialPedidos, List<Pedidos> pedidos, List<Productos> productos) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;
         this.contraseña = contraseña;
-        this.direccion = direccion;
         this.telefono = telefono;
         this.fechaRegistro = fechaRegistro;
+        this.registrado = registrado;
         this.rol = rol;
+        this.historialPedidos = historialPedidos;
         this.pedidos = pedidos;
         this.productos = productos;
     }
@@ -78,6 +81,22 @@ public class Usuarios {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Boolean getRegistrado() {
+        return registrado;
+    }
+
+    public void setRegistrado(Boolean registrado) {
+        this.registrado = registrado;
+    }
+
+    public List<String> getHistorialPedidos() {
+        return historialPedidos;
+    }
+
+    public void setHistorialPedidos(List<String> historialPedidos) {
+        this.historialPedidos = historialPedidos;
     }
 
     public String getNombre() {
@@ -102,14 +121,6 @@ public class Usuarios {
 
     public void setContraseña(String contraseña) {
         this.contraseña = contraseña;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion( String direccion) {
-        this.direccion = direccion;
     }
 
     public String getTelefono() {

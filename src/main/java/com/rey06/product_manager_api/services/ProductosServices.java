@@ -59,6 +59,7 @@ public class ProductosServices {
         if (camposActualizados.containsKey("descripcion")) producto.setDescripcion(productoParcial.getDescripcion());
         if (camposActualizados.containsKey("cantidad")) producto.setCantidad(productoParcial.getCantidad());
         if (camposActualizados.containsKey("precio")) producto.setPrecio(productoParcial.getPrecio());
+        if (camposActualizados.containsKey("categoria")) producto.setCategoria(productoParcial.getCategoria());
         if (camposActualizados.containsKey("precioOriginal")) producto.setPrecioOriginal(productoParcial.getPrecioOriginal());
         if (camposActualizados.containsKey("urlImg")) producto.setUrlImg(productoParcial.getUrlImg());
         if (camposActualizados.containsKey("oferta")) producto.setOferta(productoParcial.getOferta());
