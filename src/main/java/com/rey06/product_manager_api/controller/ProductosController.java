@@ -48,15 +48,25 @@ public class ProductosController {
         }
     }
 
-
-    // Endpoint para eliminar un producto (DELETE)
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> eliminarProducto(@PathVariable Integer id) {
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<String> activarProducto(@PathVariable Integer id) {
         try {
-            productosServices.eliminarProducto(id);
-            return ResponseEntity.ok("Producto eliminado exitosamente.");
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado.");
+            productosServices.activarProducto(id);
+            return ResponseEntity.ok("Producto activado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
+
+    @PatchMapping("/{id}/desactivar")
+    public ResponseEntity<String> desactivarProducto(@PathVariable Integer id) {
+        try {
+            productosServices.desactivarProducto(id);
+            return ResponseEntity.ok("Producto desactivado correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
+
 }

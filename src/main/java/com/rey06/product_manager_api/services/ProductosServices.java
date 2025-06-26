@@ -37,15 +37,23 @@ public class ProductosServices {
         }
     }
 
-    public Productos actualizarProducto(Integer id, Productos producto)throws Exception{
+    public Productos actualizarProducto(Integer id, Productos producto) throws Exception {
         return repository.findById(id).map(productoExistente -> {
             productoExistente.setNombre(producto.getNombre());
             productoExistente.setCantidad(producto.getCantidad());
             productoExistente.setPrecio(producto.getPrecio());
+            productoExistente.setPrecioOriginal(producto.getPrecioOriginal());
+            productoExistente.setDescripcion(producto.getDescripcion());
+            productoExistente.setOferta(producto.getOferta());
+            productoExistente.setUrlImg(producto.getUrlImg());
+            productoExistente.setCategoria(producto.getCategoria());
+            productoExistente.setActivo(producto.isActivo());
+            productoExistente.setUsuario(producto.getUsuario());
 
             return repository.save(productoExistente);
         }).orElseThrow(() -> new Exception("Producto no encontrado con ID: " + id));
     }
+
 
     @Transactional
     public Productos actualizarParcialProducto(Integer id, Map<String, Object> camposActualizados) throws Exception {

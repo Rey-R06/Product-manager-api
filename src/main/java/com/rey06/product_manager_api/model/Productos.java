@@ -28,7 +28,8 @@ public class Productos {
     @Positive(message = "El precio original debe ser mayor que cero.")
     private Float precioOriginal;
 
-    private Boolean oferta = false;
+    @Column(nullable = false)
+    private Boolean oferta;
 
     @NotNull(message = "El stock no puede ser nulo.")
     @Min(value = 0, message = "El stock no puede ser negativo.")
