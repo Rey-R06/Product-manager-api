@@ -25,6 +25,7 @@ public class Pedidos {
 
     @NotNull(message = "El estado del pedido no puede ser nulo.")
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private EstadoPedido estado;
 
     // Relación con usuario registrado (opcional)

@@ -1,8 +1,11 @@
 package com.rey06.product_manager_api.controller;
 
+import com.rey06.product_manager_api.ayudas.EstadoPedido;
 import com.rey06.product_manager_api.model.Pedidos;
 import com.rey06.product_manager_api.services.PedidosServices;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,12 +42,33 @@ public class PedidosController {
         return ResponseEntity.ok(pedido);
     }
 
-
     // Actualizar parcialmente un pedido (PATCH)
     @PatchMapping("/{id}")
     public ResponseEntity<Pedidos> actualizarParcial(@PathVariable Integer id, @RequestBody Map<String, Object> camposActualizados) throws Exception {
         return ResponseEntity.ok(pedidosServices.actualizarPedidoParcial(id, camposActualizados));
     }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<?> actualizarEstado(
+            @PathVariable Integer id,
+            @RequestBody Map<String, String> body) {
+        try {
+            String estadoStr = body.get("estado");
+            EstadoPedido nuevoEstado = EstadoPedido.valueOf(estadoStr.toUpperCase());
+
+            Pedidos actualizado = pedidosServices.actualizarEstado(id, nuevoEstado);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Estado inválido"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    Map.of("message", "Error al actualizar estado")
+            );
+        }
+    }
+
+
+
 
     // Eliminar un pedido (DELETE)
     @DeleteMapping("/{id}")

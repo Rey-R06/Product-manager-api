@@ -9,6 +9,7 @@ import com.rey06.product_manager_api.repository.IItemPedido;
 import com.rey06.product_manager_api.repository.IPedidos;
 import com.rey06.product_manager_api.repository.IProductos;
 import com.rey06.product_manager_api.repository.IUsuarios;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -143,6 +144,16 @@ public class PedidosServices {
 
         return repository.save(pedidoExistente);
     }
+
+    public Pedidos actualizarEstado(Integer id, EstadoPedido nuevoEstado) throws Exception {
+        Pedidos pedido = repository.findById(id)
+                .orElseThrow(() -> new Exception("Pedido no encontrado"));
+
+        pedido.setEstado(nuevoEstado);
+        return repository.save(pedido);
+    }
+
+
 
     @Transactional
     public Pedidos actualizarPedidoParcial(Integer id, Map<String, Object> updates) throws Exception {

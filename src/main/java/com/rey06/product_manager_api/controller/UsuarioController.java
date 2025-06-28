@@ -64,6 +64,21 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioActualizado);
     }
 
+    // UsuarioController.java
+    @PatchMapping("/{id}/agregar-pedido")
+    public ResponseEntity<?> agregarPedidoAlHistorial(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Integer> body) {
+        try {
+            Integer pedidoId = body.get("pedidoId");
+            Usuarios actualizado = usuarioServices.agregarPedidoAlHistorial(id, pedidoId);
+            return ResponseEntity.ok(actualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "No se pudo agregar el pedido al historial"));
+        }
+    }
+
 
 
     @DeleteMapping("/{id}")

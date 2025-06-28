@@ -47,8 +47,12 @@ public class Usuarios {
 
     private Boolean registrado = false; // valor por defecto
 
+    // Usuario.java
     @ElementCollection
-    private List<String> historialPedidos = new ArrayList<>();
+    @CollectionTable(name = "usuario_historial_pedidos", joinColumns = @JoinColumn(name = "usuario_id"))
+    @Column(name = "pedido_id")
+    private List<Integer> historialPedidos = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "usuario")
     @JsonManagedReference(value = "usuario-pedidos")
@@ -61,7 +65,7 @@ public class Usuarios {
     public Usuarios() {
     }
 
-    public Usuarios(Integer id, String nombre, String email, String contraseña, String telefono, Date fechaRegistro, Boolean registrado, Rol rol, List<String> historialPedidos, List<Pedidos> pedidos, List<Productos> productos) {
+    public Usuarios(Integer id, String nombre, String email, String contraseña, String telefono, Date fechaRegistro, Boolean registrado, Rol rol, List<Integer> historialPedidos, List<Pedidos> pedidos, List<Productos> productos) {
         this.id = id;
         this.nombre = nombre;
         this.email = email;
@@ -91,11 +95,11 @@ public class Usuarios {
         this.registrado = registrado;
     }
 
-    public List<String> getHistorialPedidos() {
+    public List<Integer> getHistorialPedidos() {
         return historialPedidos;
     }
 
-    public void setHistorialPedidos(List<String> historialPedidos) {
+    public void setHistorialPedidos(List<Integer> historialPedidos) {
         this.historialPedidos = historialPedidos;
     }
 

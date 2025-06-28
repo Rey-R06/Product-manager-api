@@ -86,6 +86,18 @@ public class UsuarioServices {
         return repository.save(usuario);
     }
 
+    // UsuarioService.java
+    public Usuarios agregarPedidoAlHistorial(Integer usuarioId, Integer pedidoId) throws Exception {
+        Usuarios usuario = repository.findById(usuarioId)
+                .orElseThrow(() -> new Exception("Usuario no encontrado"));
+
+        if (!usuario.getHistorialPedidos().contains(pedidoId)) {
+            usuario.getHistorialPedidos().add(pedidoId);
+        }
+
+        return repository.save(usuario);
+    }
+
 
 
     public void eliminarUsuario(Integer id) throws Exception {
