@@ -10,7 +10,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")  // permite CORS para todas las rutas
-                .allowedOrigins("http://localhost:5173", "https://joly-guacamoly-react.vercel.app/")  // permite solo tu frontend React
+                .allowedOrigins("http://localhost:5173", "https://joly-guacamoly-react.vercel.app")  // permite solo tu frontend React
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")  // métodos permitidos
                 .allowedHeaders("*");  // permite cualquier header
     }
