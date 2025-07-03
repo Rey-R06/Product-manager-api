@@ -1,6 +1,7 @@
 package com.rey06.product_manager_api.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rey06.product_manager_api.ayudas.EstadoPedido;
 import com.rey06.product_manager_api.ayudas.MetodoDePago;
 import jakarta.persistence.*;
@@ -31,7 +32,7 @@ public class Pedidos {
     // Relación con usuario registrado (opcional)
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    @JsonBackReference(value = "usuario-pedidos")
+    @JsonIgnoreProperties({"pedidos"})
     private Usuarios usuario;
 
     // Datos básicos para pedidos de invitados
