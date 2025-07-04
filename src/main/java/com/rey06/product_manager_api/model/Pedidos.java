@@ -32,7 +32,7 @@ public class Pedidos {
     // Relación con usuario registrado (opcional)
     @ManyToOne
     @JoinColumn(name = "usuario_id")
-    @JsonIgnoreProperties({"pedidos"})
+    @JsonBackReference(value = "usuario-pedidos")
     private Usuarios usuario;
 
     // Datos básicos para pedidos de invitados
