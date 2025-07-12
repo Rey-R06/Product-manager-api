@@ -9,7 +9,6 @@ import com.rey06.product_manager_api.repository.IItemPedido;
 import com.rey06.product_manager_api.repository.IPedidos;
 import com.rey06.product_manager_api.repository.IProductos;
 import com.rey06.product_manager_api.repository.IUsuarios;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -141,6 +140,7 @@ public class PedidosServices {
         pedidoExistente.setEmailDelPedido(pedidoActualizado.getEmailDelPedido());
         pedidoExistente.setTelefonoDelPedido(pedidoActualizado.getTelefonoDelPedido());
         pedidoExistente.setUsuario(pedidoActualizado.getUsuario());
+        pedidoExistente.setRegistrado(pedidoActualizado.isRegistrado());
 
         return repository.save(pedidoExistente);
     }
@@ -204,6 +204,12 @@ public class PedidosServices {
             } else {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario con ID " + usuarioId + " no encontrado");
             }
+        }
+
+        // Si se actualiza "registrado"
+        if (updates.containsKey("registrado")) {
+            boolean nuevoValor = (Boolean) updates.get("registrado");
+            pedidoExistente.setRegistrado(nuevoValor); // ✅
         }
 
         return repository.save(pedidoExistente);

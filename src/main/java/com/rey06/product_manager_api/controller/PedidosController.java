@@ -44,8 +44,16 @@ public class PedidosController {
 
     // Actualizar parcialmente un pedido (PATCH)
     @PatchMapping("/{id}")
-    public ResponseEntity<Pedidos> actualizarParcial(@PathVariable Integer id, @RequestBody Map<String, Object> camposActualizados) throws Exception {
-        return ResponseEntity.ok(pedidosServices.actualizarPedidoParcial(id, camposActualizados));
+    public ResponseEntity<?> actualizarParcial(@PathVariable Integer id, @RequestBody Map<String, Object> camposActualizados) {
+        try {
+            Pedidos pedidoActualizado = pedidosServices.actualizarPedidoParcial(id, camposActualizados);
+            return ResponseEntity.ok(pedidoActualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "mensaje", "No se pudo actualizar el pedido",
+                    "detalle", e.getMessage()
+            ));
+        }
     }
 
     @PatchMapping("/{id}/estado")

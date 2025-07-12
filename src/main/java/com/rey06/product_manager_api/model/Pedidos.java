@@ -7,6 +7,7 @@ import com.rey06.product_manager_api.ayudas.MetodoDePago;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -46,15 +47,17 @@ public class Pedidos {
     @Column(nullable = false)
     private String direccionEntrega;
 
+    private boolean registrado = true;
+
     @NotEmpty(message = "Debe haber al menos un producto en el pedido.")
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ItemPedido> itemsPedido;
+    private List<ItemPedido> itemsPedido = new ArrayList<>();
 
 
     public Pedidos() {
     }
 
-    public Pedidos(Integer id, Date fechaDelPedido, Float totalCompra, EstadoPedido estado, Usuarios usuario, String nombreDelPedido, String emailDelPedido, String telefonoDelPedido, MetodoDePago metodoDePago, String direccionEntrega, List<ItemPedido> itemsPedido) {
+    public Pedidos(Integer id, Date fechaDelPedido, Float totalCompra, EstadoPedido estado, Usuarios usuario, String nombreDelPedido, String emailDelPedido, String telefonoDelPedido, MetodoDePago metodoDePago, String direccionEntrega, boolean registrado, List<ItemPedido> itemsPedido) {
         this.id = id;
         this.fechaDelPedido = fechaDelPedido;
         this.totalCompra = totalCompra;
@@ -65,7 +68,16 @@ public class Pedidos {
         this.telefonoDelPedido = telefonoDelPedido;
         this.metodoDePago = metodoDePago;
         this.direccionEntrega = direccionEntrega;
+        this.registrado = registrado;
         this.itemsPedido = itemsPedido;
+    }
+
+    public boolean isRegistrado() {
+        return registrado;
+    }
+
+    public void setRegistrado(boolean registrado) {
+        this.registrado = registrado;
     }
 
     public Integer getId() {
